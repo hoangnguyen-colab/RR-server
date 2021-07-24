@@ -8,7 +8,7 @@ app.use(cors());
 const http = require('http').Server(app);
 const io = require("socket.io")(http, {
   cors: true,
-  origins: ["http://localhost:5000"],
+  origins: ["http://localhost:5000", "https://rr-chat-server.herokuapp.com"],
 });
 
 // io.on('connect', (socket) => {
