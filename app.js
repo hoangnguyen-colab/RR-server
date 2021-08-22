@@ -1,7 +1,7 @@
 const cors = require('cors');
 const app = require('express')();
 
-const { addUser, removeUser, getUser, getUsersInRoom } = require('./users');
+const { addUserGeneral, removeUserGeneral, addUserRoom, removeUserRoom, getUser, getUsersInRoom } = require('./users');
 
 app.use(cors());
 
@@ -46,10 +46,17 @@ const io = require("socket.io")(http, {
 // });
 
 io.on('connection', (socket) => {
-  console.log('user disconnected');
-  socket.on('join', ({ userName, room }, callback) => {
-    console.log(userName);
-    socket.broadcast.emit('join', userName);
+  console.log('user connected');
+
+  socket.on('join', ({ userName, userId }, callback) => {
+    const { error, user } = addUserGeneral({ socketId: socket.id, userId: userId, name: userName });
+    console.log(user);
+
+    if (error) return;
+    // return callback(error);
+    socket.broadcast.emit('join', user);
+
+    // callback();
   });
 
   socket.on('message', (message, callback) => {
@@ -58,6 +65,8 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
     console.log('user disconnected');
+    const user = removeUserGeneral(socket.id);
+    socket.broadcast.emit('on_disconnet', user);
   })
 });
 
