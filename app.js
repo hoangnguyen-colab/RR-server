@@ -50,10 +50,8 @@ io.on('connection', (socket) => {
 
   socket.on('join', ({ userName, userId }, callback) => {
     const { error, user } = addUserGeneral({ socketId: socket.id, userId: userId, name: userName });
-    console.log(user);
 
-    if (error) return;
-    // return callback(error);
+    if (error) return callback(error);
     socket.broadcast.emit('join', user);
 
     // callback();
