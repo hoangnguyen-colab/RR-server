@@ -1,25 +1,24 @@
-const usersGeneral = [];
-const users = [];
+let usersGeneral = [];
+let users = [];
 
 const addUserGeneral = ({ socketId, userId, name }) => {
   name = name.trim().toLowerCase();
-  if (!name) return { error: 'Username are required.' };
+  if (!name) { name = '<blank>' };
 
-  const existingUser = usersGeneral.find((user) => user.name === name);
-
-  if (existingUser) return { error: 'Username is taken.' };
+  // if (!name) return { error: 'Username are required.' };
+  // const existingUser = usersGeneral.find((user) => user.name === name);
+  // if (existingUser) return { error: 'Username is taken.' };
 
   const user = { socketId, userId, name };
 
   usersGeneral.push(user);
 
-  return { user };
+  return { userList: usersGeneral };
 }
 
 const removeUserGeneral = (socketId) => {
-  const index = usersGeneral.findIndex((user) => user.socketId === socketId);
-
-  if (index !== -1) return usersGeneral.splice(index, 1)[0];
+  usersGeneral = usersGeneral.filter(x => x.socketId !== socketId);
+  return usersGeneral;
 }
 
 const addUserRoom = ({ id, name, room }) => {
@@ -44,8 +43,10 @@ const removeUserRoom = (id) => {
   if (index !== -1) return users.splice(index, 1)[0];
 }
 
+const getUserGeneralListAll = () => usersGeneral;
+const getUserGeneralList = (userid) => usersGeneral.filter(item => item.userId !== userid);
 const getUser = (id) => users.find((user) => user.id === id);
 
 const getUsersInRoom = (room) => users.filter((user) => user.room === room);
 
-module.exports = { addUserGeneral, removeUserGeneral, addUserRoom, removeUserRoom, getUser, getUsersInRoom };
+module.exports = { addUserGeneral, removeUserGeneral, getUserGeneralListAll, getUserGeneralList };

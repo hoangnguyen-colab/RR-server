@@ -1,7 +1,7 @@
 const cors = require('cors');
 const app = require('express')();
 
-const { addUserGeneral, removeUserGeneral, addUserRoom, removeUserRoom, getUser, getUsersInRoom } = require('./users');
+const { addUserGeneral, removeUserGeneral, getUserGeneralList, getUserGeneralListAll } = require('./users');
 
 app.use(cors());
 
@@ -46,15 +46,17 @@ const io = require("socket.io")(http, {
 // });
 
 io.on('connection', (socket) => {
-  console.log('user connected');
+  // console.log('user connected');
+
+  socket.on('getUserList', function (data, callback) {
+    const list = getUserGeneralList(data.userId);
+    callback(list);
+  });
 
   socket.on('join', ({ userName, userId }, callback) => {
-    const { error, user } = addUserGeneral({ socketId: socket.id, userId: userId, name: userName });
+    const { error, userList } = addUserGeneral({ socketId: socket.id, userId: userId, name: userName });
 
-    if (error) return callback(error);
-    socket.broadcast.emit('join', user);
-
-    // callback();
+    socket.broadcast.emit('on_join', userList);
   });
 
   socket.on('message', (message, callback) => {
@@ -62,9 +64,11 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
-    console.log('user disconnected');
-    const user = removeUserGeneral(socket.id);
-    socket.broadcast.emit('on_disconnet', user);
+    // console.log('user disconnected');
+    const userList = removeUserGeneral(socket.id);
+    if (userList) {
+      socket.broadcast.emit('on_disconnet', userList);
+    }
   })
 });
 
