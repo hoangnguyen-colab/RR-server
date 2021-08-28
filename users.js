@@ -6,12 +6,14 @@ const addUserGeneral = ({ socketId, userId, name }) => {
   if (!name) { name = '<blank>' };
 
   // if (!name) return { error: 'Username are required.' };
-  // const existingUser = usersGeneral.find((user) => user.name === name);
+  const existingUser = usersGeneral.find((user) => user.socketId === socketId);
   // if (existingUser) return { error: 'Username is taken.' };
+  
+  if (!existingUser) {
+    const user = { socketId, userId, name };
 
-  const user = { socketId, userId, name };
-
-  usersGeneral.push(user);
+    usersGeneral.push(user);
+  }
 
   return { userList: usersGeneral };
 }
